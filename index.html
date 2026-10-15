@@ -210,12 +210,13 @@
 
   <script>
     // PEGAR TU URL DE GOOGLE APPS SCRIPT AQUÍ
-    var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwQrjJ5EIQP4h8SBEtJ6ynoSMu5RJ_IYl1E6USYpMswlgEmv-Uh7vaqF_pHOyOB57w/exec";
+    var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw5q8nbrUqyc4rA_bqNK5G1wNtzn-Jby3t8PrzNZjNmy1aftgKloFAQ9DwFZBQXX8A/exec";
 
     var CODES = ['A', 'I', 'M', 'O', 'D', 'E'];
     var currentDate = new Date();
     var items = [];
     var STORAGE_KEY = 'aimode_matrix_data';
+    var canSync = false; // se activa recién cuando se pudo leer la planilla
 
     function getMonthKey() {
       var y = currentDate.getFullYear();
@@ -248,7 +249,7 @@
         { id: 5, month: mk, category: 'D', text: 'Diseño de banners para redes', completed: false, notes: 'Pasar al próximo mes' },
         { id: 6, month: mk, category: 'E', text: 'Procrastinación en redes sociales', completed: false, notes: 'Pasar al próximo mes' }
       ];
-      saveData();
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); } catch (e) {}
     }
 
     function saveData() {
@@ -267,25 +268,37 @@
       }
       
       fetch(GOOGLE_SCRIPT_URL)
-        .then(function(res) { return res.json(); })
-        .then(function(data) {
-          if (data && data.status === "success" && Array.isArray(data.items)) {
-            if (data.items.length > 0) {
-              items = data.items;
-              localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-              renderAll();
-            }
-            if (showAlert) alert("¡Datos recargados desde la planilla!");
+        .then(function(res) {
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          return res.text();
+        })
+        .then(function(txt) {
+          var data;
+          try { data = JSON.parse(txt); }
+          catch (e) { throw new Error("El script no devolvió JSON (¿acceso no es 'Cualquier persona'?)"); }
+          if (!data || data.status !== "success" || !Array.isArray(data.items)) {
+            throw new Error("Respuesta inesperada: " + (data && data.message ? data.message : txt.slice(0, 120)));
           }
+          if (data.items.length > 0) {
+            items = data.items;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+            renderAll();
+            canSync = true;
+          } else {
+            canSync = true;
+            syncToGoogleSheetsSilently(); // planilla vacía: subir lo local
+          }
+          if (showAlert) alert("¡Datos recargados desde la planilla!");
         })
         .catch(function(err) {
-          console.log("Error consultando planilla:", err);
-          if (showAlert) alert("No se pudo conectar a la planilla.");
+          console.error("Error consultando planilla:", err);
+          if (showAlert) alert("No se pudo leer la planilla:\n" + err.message);
         });
     }
 
     function syncToGoogleSheetsSilently() {
       if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.indexOf("YOUR_SCRIPT_ID") !== -1) return;
+      if (!canSync) { console.warn("Sync omitido: todavía no se pudo leer la planilla."); return; }
       try {
         fetch(GOOGLE_SCRIPT_URL, {
           method: "POST",
