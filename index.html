@@ -64,7 +64,7 @@
       <div class="flex items-center gap-2 w-full md:w-auto justify-end">
         <button 
           type="button"
-          onclick="fetchFromGoogleSheets()"
+          onclick="fetchFromGoogleSheets(true)"
           class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-1 shadow-sm"
           title="Actualizar datos desde Google Sheets"
         >
@@ -210,8 +210,8 @@
   </div>
 
   <script>
-    // URL DE TU IMPLEMENTACIÓN DE GOOGLE APPS SCRIPT
-    var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwH_ArLaULEU6sV0Ui-d_EVsK0pTc9joVxUREqhbfrYqduXHA7LJwAmUjF9BGH2cg/exec";
+    // REEMPLAZAR ESTA URL CON TU URL DE GOOGLE APPS SCRIPT
+    var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyL4dSgBYm3-95nxZclQ1b-GaG4Y6u-JURvTmSevc6bee3VO-CAtZYa2HgHIh6RUVE/exec";
 
     var CODES = ['A', 'I', 'M', 'O', 'D', 'E'];
     var currentDate = new Date();
@@ -233,11 +233,24 @@
         var saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
           var parsed = JSON.parse(saved);
-          if (Array.isArray(parsed)) items = parsed;
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            items = parsed;
+            return;
+          }
         }
-      } catch (e) {
-        items = [];
-      }
+      } catch (e) { console.error(e); }
+
+      // Datos por defecto si está completamente vacío
+      var mk = getMonthKey();
+      items = [
+        { id: 1, month: mk, category: 'A', text: 'Ingresos por consultoría', completed: false, notes: 'Fidelizar clientes' },
+        { id: 2, month: mk, category: 'I', text: '30 min de ejercicio diario', completed: true, notes: 'Cumplido' },
+        { id: 3, month: mk, category: 'M', text: 'Hábitos de lectura diaria', completed: true, notes: 'Cumplido' },
+        { id: 4, month: mk, category: 'O', text: 'Carpetas de proyectos en GitHub', completed: true, notes: 'Organizado' },
+        { id: 5, month: mk, category: 'D', text: 'Diseño de banners para redes', completed: false, notes: 'Pasar al próximo mes' },
+        { id: 6, month: mk, category: 'E', text: 'Procrastinación en redes sociales', completed: false, notes: 'Pasar al próximo mes' }
+      ];
+      saveData();
     }
 
     function saveData() {
@@ -249,19 +262,28 @@
       }
     }
 
-    function fetchFromGoogleSheets() {
-      if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.indexOf("TU_SCRIPT_ID") !== -1) return;
+    function fetchFromGoogleSheets(showAlert) {
+      if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.indexOf("TU_SCRIPT_ID") !== -1) {
+        if (showAlert) alert("Primero configura tu URL de Google Apps Script en el archivo HTML.");
+        return;
+      }
       
       fetch(GOOGLE_SCRIPT_URL)
         .then(function(res) { return res.json(); })
         .then(function(data) {
-          if (data && data.status === "success" && Array.isArray(data.items)) {
+          if (data && data.status === "success" && Array.isArray(data.items) && data.items.length > 0) {
             items = data.items;
             localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
             renderAll();
+            if (showAlert) alert("¡Datos recargados desde Google Sheets!");
+          } else if (showAlert) {
+            alert("No se encontraron registros previos en la planilla.");
           }
         })
-        .catch(function(err) { console.log("Carga de planilla:", err); });
+        .catch(function(err) {
+          console.log("No se pudo conectar con la planilla:", err);
+          if (showAlert) alert("No se pudo cargar la planilla. Se mantienen los datos locales.");
+        });
     }
 
     function syncToGoogleSheetsSilently() {
@@ -271,7 +293,7 @@
         mode: "no-cors",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "sync_all", items: items })
-      }).catch(function(err) { console.log("Sync silenciosa:", err); });
+      }).catch(function(err) { console.log("Sync silencioso:", err); });
     }
 
     function handleKeyPress(e, code) {
@@ -443,7 +465,7 @@
     // Inicialización
     loadData();
     renderAll();
-    fetchFromGoogleSheets(); // Carga la versión más reciente al iniciar la web
+    fetchFromGoogleSheets(false); // Carga asíncrona segura sin bloquear la pantalla
   </script>
 </body>
 </html>
