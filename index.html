@@ -10,31 +10,31 @@
   <div class="max-w-7xl mx-auto px-4 py-8">
     
     <!-- Encabezado Principal -->
-    <header class="mb-8 border-b border-slate-200 pb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <header class="th-line mb-8 border-b border-slate-200 pb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
       <div>
         <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-3">
-          <span class="bg-indigo-600 text-white px-3 py-1 rounded-xl text-xl shadow-md">AIMODE</span>
+          <span class="th-accent-bg bg-indigo-600 text-white px-3 py-1 rounded-xl text-xl shadow-md">AIMODE</span>
           Matriz de Planificación Mensual
         </h1>
-        <p class="text-slate-500 text-sm mt-1">Aumentar · Incorporar · Mantener · Organizar · Delegar · Evitar</p>
+        <p class="th-muted text-slate-500 text-sm mt-1">Aumentar · Incorporar · Mantener · Organizar · Delegar · Evitar</p>
       </div>
 
       <!-- Control de Navegación de Mes -->
-      <div class="flex items-center gap-3 bg-white p-2 rounded-xl shadow-sm border border-slate-200">
-        <button type="button" onclick="changeMonth(-1)" class="p-2 hover:bg-slate-100 rounded-lg text-slate-600 transition">
+      <div class="th-card flex items-center gap-3 bg-white p-2 rounded-xl shadow-sm border border-slate-200">
+        <button type="button" onclick="changeMonth(-1)" class="th-text p-2 hover:bg-slate-100 rounded-lg text-slate-600 transition">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
         </button>
         <div class="text-center min-w-[140px]">
-          <span id="current-month-label" class="text-lg font-bold text-slate-800 capitalize">--</span>
+          <span id="current-month-label" class="th-text text-lg font-bold text-slate-800 capitalize">--</span>
         </div>
-        <button type="button" onclick="changeMonth(1)" class="p-2 hover:bg-slate-100 rounded-lg text-slate-600 transition">
+        <button type="button" onclick="changeMonth(1)" class="th-text p-2 hover:bg-slate-100 rounded-lg text-slate-600 transition">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
         </button>
       </div>
     </header>
 
     <!-- Barra de Herramientas, Búsqueda y Acciones -->
-    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-8 flex flex-col md:flex-row items-center justify-between gap-4">
+    <div class="th-card bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-8 flex flex-col md:flex-row items-center justify-between gap-4">
       
       <!-- Buscador en tiempo real -->
       <div class="relative w-full md:w-96">
@@ -50,32 +50,37 @@
 
       <!-- Barra de Progreso Mensual -->
       <div class="w-full md:w-72 flex flex-col gap-1">
-        <div class="flex justify-between text-xs font-semibold text-slate-600">
+        <div class="th-text flex justify-between text-xs font-semibold text-slate-600">
           <span>Cumplimiento del Mes</span>
           <span id="progress-text">0 / 0 (0%)</span>
         </div>
-        <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden border border-slate-200">
+        <div class="th-track w-full bg-slate-100 h-2.5 rounded-full overflow-hidden border border-slate-200">
           <div id="progress-bar" class="bg-emerald-500 h-full transition-all duration-300 w-0"></div>
         </div>
       </div>
 
       <!-- Acciones Globales (solo iconos, caben en pantallas de celular) -->
       <div class="flex items-center gap-2 w-full md:w-auto justify-end">
-        <button type="button" onclick="fetchFromGoogleSheets(true)"
+        <button type="button" id="btn-reload" onclick="fetchFromGoogleSheets(true)"
           class="w-10 h-10 shrink-0 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition flex items-center justify-center shadow-sm cursor-pointer"
           title="Recargar planilla" aria-label="Recargar planilla">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
         </button>
-        <button type="button" onclick="carryOverPendingItems()"
+        <button type="button" id="btn-carry" onclick="carryOverPendingItems()"
           class="w-10 h-10 shrink-0 bg-amber-600 hover:bg-amber-700 text-white rounded-lg transition flex items-center justify-center shadow-sm cursor-pointer"
           title="Pase de mes (traspasar pendientes)" aria-label="Pase de mes">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
         </button>
-        <a href="https://docs.google.com/spreadsheets/d/1aRNsNkQFJELr-BhICT6C_LgnTmHrOYw9FvfpKx37UcI/edit?usp=drivesdk" target="_blank" rel="noopener"
+        <a id="btn-db" href="https://docs.google.com/spreadsheets/d/1aRNsNkQFJELr-BhICT6C_LgnTmHrOYw9FvfpKx37UcI/edit?usp=drivesdk" target="_blank" rel="noopener"
           class="w-10 h-10 shrink-0 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition flex items-center justify-center shadow-sm"
           title="Ver base de datos" aria-label="Ver base de datos">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/></svg>
         </a>
+        <button type="button" onclick="openConfig()"
+          class="w-10 h-10 shrink-0 bg-slate-600 hover:bg-slate-700 text-white rounded-lg transition flex items-center justify-center shadow-sm cursor-pointer"
+          title="Configuración de colores" aria-label="Configuración de colores">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+        </button>
       </div>
     </div>
 
@@ -83,7 +88,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
       <!-- 1. AUMENTAR (A) -->
-      <div class="bg-white rounded-xl border border-emerald-300 shadow-sm flex flex-col overflow-hidden">
+      <div data-cat="A" class="bg-white rounded-xl border border-emerald-300 shadow-sm flex flex-col overflow-hidden">
         <div class="bg-emerald-100 text-emerald-900 p-4 border-b flex items-center justify-between">
           <div class="flex items-center gap-2">
             <span class="font-black text-xl px-2 py-0.5 rounded bg-white/40 border border-white/20">A</span>
@@ -94,14 +99,14 @@
         <div class="p-3 bg-slate-50/50 border-b border-slate-100">
           <div class="flex gap-2">
             <input id="input-A" type="text" placeholder="Escribir e ingresar..." onkeypress="handleKeyPress(event, 'A')" class="flex-1 px-3 py-1.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            <button type="button" onclick="addItem('A')" class="bg-slate-800 hover:bg-slate-900 text-white px-3.5 py-1.5 rounded-lg text-sm font-bold transition flex items-center justify-center cursor-pointer shadow-sm">+</button>
+            <button type="button" onclick="addItem('A')" class="th-add bg-slate-800 hover:bg-slate-900 text-white px-3.5 py-1.5 rounded-lg text-sm font-bold transition flex items-center justify-center cursor-pointer shadow-sm">+</button>
           </div>
         </div>
         <div id="list-A" class="p-3 flex-1 overflow-y-auto max-h-[350px] flex flex-col gap-2"></div>
       </div>
 
       <!-- 2. INCORPORAR (I) -->
-      <div class="bg-white rounded-xl border border-blue-300 shadow-sm flex flex-col overflow-hidden">
+      <div data-cat="I" class="bg-white rounded-xl border border-blue-300 shadow-sm flex flex-col overflow-hidden">
         <div class="bg-blue-100 text-blue-900 p-4 border-b flex items-center justify-between">
           <div class="flex items-center gap-2">
             <span class="font-black text-xl px-2 py-0.5 rounded bg-white/40 border border-white/20">I</span>
@@ -112,14 +117,14 @@
         <div class="p-3 bg-slate-50/50 border-b border-slate-100">
           <div class="flex gap-2">
             <input id="input-I" type="text" placeholder="Escribir e ingresar..." onkeypress="handleKeyPress(event, 'I')" class="flex-1 px-3 py-1.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            <button type="button" onclick="addItem('I')" class="bg-slate-800 hover:bg-slate-900 text-white px-3.5 py-1.5 rounded-lg text-sm font-bold transition flex items-center justify-center cursor-pointer shadow-sm">+</button>
+            <button type="button" onclick="addItem('I')" class="th-add bg-slate-800 hover:bg-slate-900 text-white px-3.5 py-1.5 rounded-lg text-sm font-bold transition flex items-center justify-center cursor-pointer shadow-sm">+</button>
           </div>
         </div>
         <div id="list-I" class="p-3 flex-1 overflow-y-auto max-h-[350px] flex flex-col gap-2"></div>
       </div>
 
       <!-- 3. MANTENER (M) -->
-      <div class="bg-white rounded-xl border border-indigo-300 shadow-sm flex flex-col overflow-hidden">
+      <div data-cat="M" class="bg-white rounded-xl border border-indigo-300 shadow-sm flex flex-col overflow-hidden">
         <div class="bg-indigo-100 text-indigo-900 p-4 border-b flex items-center justify-between">
           <div class="flex items-center gap-2">
             <span class="font-black text-xl px-2 py-0.5 rounded bg-white/40 border border-white/20">M</span>
@@ -130,14 +135,14 @@
         <div class="p-3 bg-slate-50/50 border-b border-slate-100">
           <div class="flex gap-2">
             <input id="input-M" type="text" placeholder="Escribir e ingresar..." onkeypress="handleKeyPress(event, 'M')" class="flex-1 px-3 py-1.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            <button type="button" onclick="addItem('M')" class="bg-slate-800 hover:bg-slate-900 text-white px-3.5 py-1.5 rounded-lg text-sm font-bold transition flex items-center justify-center cursor-pointer shadow-sm">+</button>
+            <button type="button" onclick="addItem('M')" class="th-add bg-slate-800 hover:bg-slate-900 text-white px-3.5 py-1.5 rounded-lg text-sm font-bold transition flex items-center justify-center cursor-pointer shadow-sm">+</button>
           </div>
         </div>
         <div id="list-M" class="p-3 flex-1 overflow-y-auto max-h-[350px] flex flex-col gap-2"></div>
       </div>
 
       <!-- 4. ORGANIZAR (O) -->
-      <div class="bg-white rounded-xl border border-amber-300 shadow-sm flex flex-col overflow-hidden">
+      <div data-cat="O" class="bg-white rounded-xl border border-amber-300 shadow-sm flex flex-col overflow-hidden">
         <div class="bg-amber-100 text-amber-900 p-4 border-b flex items-center justify-between">
           <div class="flex items-center gap-2">
             <span class="font-black text-xl px-2 py-0.5 rounded bg-white/40 border border-white/20">O</span>
@@ -148,14 +153,14 @@
         <div class="p-3 bg-slate-50/50 border-b border-slate-100">
           <div class="flex gap-2">
             <input id="input-O" type="text" placeholder="Escribir e ingresar..." onkeypress="handleKeyPress(event, 'O')" class="flex-1 px-3 py-1.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            <button type="button" onclick="addItem('O')" class="bg-slate-800 hover:bg-slate-900 text-white px-3.5 py-1.5 rounded-lg text-sm font-bold transition flex items-center justify-center cursor-pointer shadow-sm">+</button>
+            <button type="button" onclick="addItem('O')" class="th-add bg-slate-800 hover:bg-slate-900 text-white px-3.5 py-1.5 rounded-lg text-sm font-bold transition flex items-center justify-center cursor-pointer shadow-sm">+</button>
           </div>
         </div>
         <div id="list-O" class="p-3 flex-1 overflow-y-auto max-h-[350px] flex flex-col gap-2"></div>
       </div>
 
       <!-- 5. DELEGAR (D) -->
-      <div class="bg-white rounded-xl border border-purple-300 shadow-sm flex flex-col overflow-hidden">
+      <div data-cat="D" class="bg-white rounded-xl border border-purple-300 shadow-sm flex flex-col overflow-hidden">
         <div class="bg-purple-100 text-purple-900 p-4 border-b flex items-center justify-between">
           <div class="flex items-center gap-2">
             <span class="font-black text-xl px-2 py-0.5 rounded bg-white/40 border border-white/20">D</span>
@@ -166,14 +171,14 @@
         <div class="p-3 bg-slate-50/50 border-b border-slate-100">
           <div class="flex gap-2">
             <input id="input-D" type="text" placeholder="Escribir e ingresar..." onkeypress="handleKeyPress(event, 'D')" class="flex-1 px-3 py-1.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            <button type="button" onclick="addItem('D')" class="bg-slate-800 hover:bg-slate-900 text-white px-3.5 py-1.5 rounded-lg text-sm font-bold transition flex items-center justify-center cursor-pointer shadow-sm">+</button>
+            <button type="button" onclick="addItem('D')" class="th-add bg-slate-800 hover:bg-slate-900 text-white px-3.5 py-1.5 rounded-lg text-sm font-bold transition flex items-center justify-center cursor-pointer shadow-sm">+</button>
           </div>
         </div>
         <div id="list-D" class="p-3 flex-1 overflow-y-auto max-h-[350px] flex flex-col gap-2"></div>
       </div>
 
       <!-- 6. EVITAR (E) -->
-      <div class="bg-white rounded-xl border border-rose-300 shadow-sm flex flex-col overflow-hidden">
+      <div data-cat="E" class="bg-white rounded-xl border border-rose-300 shadow-sm flex flex-col overflow-hidden">
         <div class="bg-rose-100 text-rose-900 p-4 border-b flex items-center justify-between">
           <div class="flex items-center gap-2">
             <span class="font-black text-xl px-2 py-0.5 rounded bg-white/40 border border-white/20">E</span>
@@ -184,7 +189,7 @@
         <div class="p-3 bg-slate-50/50 border-b border-slate-100">
           <div class="flex gap-2">
             <input id="input-E" type="text" placeholder="Escribir e ingresar..." onkeypress="handleKeyPress(event, 'E')" class="flex-1 px-3 py-1.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            <button type="button" onclick="addItem('E')" class="bg-slate-800 hover:bg-slate-900 text-white px-3.5 py-1.5 rounded-lg text-sm font-bold transition flex items-center justify-center cursor-pointer shadow-sm">+</button>
+            <button type="button" onclick="addItem('E')" class="th-add bg-slate-800 hover:bg-slate-900 text-white px-3.5 py-1.5 rounded-lg text-sm font-bold transition flex items-center justify-center cursor-pointer shadow-sm">+</button>
           </div>
         </div>
         <div id="list-E" class="p-3 flex-1 overflow-y-auto max-h-[350px] flex flex-col gap-2"></div>
@@ -192,23 +197,40 @@
 
     </div>
 
-    <footer class="mt-12 text-center text-xs text-slate-400 border-t border-slate-200 pt-6">
+    <footer class="th-muted th-line mt-12 text-center text-xs text-slate-400 border-t border-slate-200 pt-6">
       Matriz AIMODE · Modelo de Organización Mensual · Datos almacenados en el navegador y sincronizados con Google Sheets
     </footer>
 
   </div>
 
+  <!-- Popup de configuración de colores -->
+  <div id="config-modal" class="hidden fixed inset-0 z-50 bg-slate-900/50 items-center justify-center p-4" onclick="if(event.target===this) closeConfig()">
+    <div class="th-card bg-white rounded-xl shadow-xl w-full max-w-md max-h-[90vh] flex flex-col">
+      <div class="th-line p-4 border-b flex items-center justify-between">
+        <h3 class="th-text text-base font-bold">Configuración de colores</h3>
+        <button type="button" onclick="closeConfig()" class="th-text p-1 cursor-pointer" aria-label="Cerrar">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div id="config-body" class="p-4 overflow-y-auto flex-1"></div>
+      <div class="th-line p-4 border-t flex justify-between gap-2">
+        <button type="button" onclick="resetTheme()" class="px-3 py-1.5 text-sm rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 cursor-pointer">Restablecer</button>
+        <button type="button" onclick="closeConfig()" class="px-3 py-1.5 text-sm rounded-lg th-accent-bg bg-indigo-600 hover:bg-indigo-700 text-white font-medium cursor-pointer">Listo</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Popup de observación -->
   <div id="note-modal" class="hidden fixed inset-0 z-50 bg-slate-900/50 items-center justify-center p-4" onclick="if(event.target===this) closeNoteModal()">
-    <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-4 flex flex-col gap-3">
+    <div class="th-card bg-white rounded-xl shadow-xl w-full max-w-md p-4 flex flex-col gap-3">
       <div>
-        <h3 class="text-sm font-bold text-slate-800">Observación</h3>
-        <p id="note-modal-title" class="text-xs text-slate-500 mt-0.5 break-words"></p>
+        <h3 class="th-text text-sm font-bold text-slate-800">Observación</h3>
+        <p id="note-modal-title" class="th-muted text-xs text-slate-500 mt-0.5 break-words"></p>
       </div>
       <textarea id="note-modal-text" rows="5" placeholder="Escribí una observación..." class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
       <div class="flex justify-end gap-2">
         <button type="button" onclick="closeNoteModal()" class="px-3 py-1.5 text-sm rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 cursor-pointer">Cancelar</button>
-        <button type="button" onclick="saveNoteModal()" class="px-3 py-1.5 text-sm rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium cursor-pointer">Guardar</button>
+        <button type="button" onclick="saveNoteModal()" class="px-3 py-1.5 text-sm rounded-lg th-accent-bg bg-indigo-600 hover:bg-indigo-700 text-white font-medium cursor-pointer">Guardar</button>
       </div>
     </div>
   </div>
@@ -359,6 +381,150 @@
       renderAll();
     }
 
+    // ===== CONFIGURACIÓN DE COLORES =====
+    var THEME_KEY = 'aimode_theme';
+    var CAT_NAMES = { A: 'Aumentar', I: 'Incorporar', M: 'Mantener', O: 'Organizar', D: 'Delegar', E: 'Evitar' };
+    var THEME_DEFAULTS = {
+      pageBg: '#f8fafc', text: '#1e293b', muted: '#64748b', card: '#ffffff', border: '#e2e8f0', accent: '#4f46e5',
+      btnReload: '#4f46e5', btnCarry: '#d97706', btnDb: '#059669', btnAdd: '#1e293b',
+      progress: '#10b981', progressTrack: '#f1f5f9',
+      doneBg: '#ecfdf5', doneBorder: '#a7f3d0',
+      cats: {
+        A: { bg: '#d1fae5', text: '#064e3b', border: '#6ee7b7' },
+        I: { bg: '#dbeafe', text: '#1e3a8a', border: '#93c5fd' },
+        M: { bg: '#e0e7ff', text: '#312e81', border: '#a5b4fc' },
+        O: { bg: '#fef3c7', text: '#78350f', border: '#fcd34d' },
+        D: { bg: '#f3e8ff', text: '#581c87', border: '#d8b4fe' },
+        E: { bg: '#ffe4e6', text: '#881337', border: '#fda4af' }
+      }
+    };
+    var THEME_SCHEMA = [
+      { title: 'General', fields: [
+        ['pageBg', 'Fondo de la página'], ['text', 'Texto'], ['muted', 'Texto secundario'],
+        ['card', 'Tarjetas y paneles'], ['border', 'Bordes'], ['accent', 'Color principal (AIMODE, lápiz, Guardar)'] ] },
+      { title: 'Botones', fields: [
+        ['btnReload', 'Recargar planilla'], ['btnCarry', 'Pase de mes'], ['btnDb', 'Base de datos'], ['btnAdd', 'Agregar (+)'] ] },
+      { title: 'Progreso', fields: [ ['progress', 'Barra de cumplimiento'], ['progressTrack', 'Fondo de la barra'] ] },
+      { title: 'Ítems completados', fields: [ ['doneBg', 'Fondo'], ['doneBorder', 'Borde'] ] }
+    ];
+    var theme = null;
+
+    function cloneTheme(o) { return JSON.parse(JSON.stringify(o)); }
+    function isColor(v) { return typeof v === 'string' && /^#[0-9a-fA-F]{6}$/.test(v); }
+
+    function loadTheme() {
+      theme = cloneTheme(THEME_DEFAULTS);
+      try {
+        var saved = JSON.parse(localStorage.getItem(THEME_KEY) || 'null');
+        if (saved && typeof saved === 'object') {
+          Object.keys(theme).forEach(function(k) {
+            if (k === 'cats') {
+              CODES.forEach(function(c) {
+                if (saved.cats && saved.cats[c]) {
+                  ['bg', 'text', 'border'].forEach(function(f) {
+                    if (isColor(saved.cats[c][f])) theme.cats[c][f] = saved.cats[c][f];
+                  });
+                }
+              });
+            } else if (isColor(saved[k])) { theme[k] = saved[k]; }
+          });
+        }
+      } catch (e) { console.error(e); }
+      applyTheme();
+    }
+
+    function saveTheme() {
+      try { localStorage.setItem(THEME_KEY, JSON.stringify(theme)); } catch (e) { console.error(e); }
+    }
+
+    function buildThemeCss(t) {
+      var css = [];
+      css.push('body{background:' + t.pageBg + ' !important;color:' + t.text + ' !important}');
+      css.push('h1,.th-text{color:' + t.text + ' !important}');
+      css.push('.th-muted{color:' + t.muted + ' !important}');
+      css.push('.th-card{background:' + t.card + ' !important;border-color:' + t.border + ' !important}');
+      css.push('.th-line{border-color:' + t.border + ' !important}');
+      css.push('.th-accent-bg{background:' + t.accent + ' !important}');
+      css.push('.th-accent-text{color:' + t.accent + ' !important}');
+      css.push('#btn-reload{background:' + t.btnReload + ' !important}');
+      css.push('#btn-carry{background:' + t.btnCarry + ' !important}');
+      css.push('#btn-db{background:' + t.btnDb + ' !important}');
+      css.push('.th-add{background:' + t.btnAdd + ' !important}');
+      css.push('#progress-bar{background:' + t.progress + ' !important}');
+      css.push('.th-track{background:' + t.progressTrack + ' !important}');
+      css.push('.th-item{background:' + t.card + ' !important;border-color:' + t.border + ' !important}');
+      css.push('.th-item-done{background:' + t.doneBg + ' !important;border-color:' + t.doneBorder + ' !important}');
+      CODES.forEach(function(c) {
+        var k = t.cats[c];
+        css.push('[data-cat="' + c + '"]{background:' + t.card + ' !important;border-color:' + k.border + ' !important}');
+        css.push('[data-cat="' + c + '"]>div:first-child{background:' + k.bg + ' !important;color:' + k.text + ' !important;border-color:' + k.border + ' !important}');
+      });
+      return css.join('\n');
+    }
+
+    function applyTheme() {
+      var el = document.getElementById('theme-style');
+      if (!el) { el = document.createElement('style'); el.id = 'theme-style'; document.head.appendChild(el); }
+      el.textContent = buildThemeCss(theme);
+    }
+
+    function colorRow(label, value, key, cat) {
+      return '<label class="flex items-center justify-between gap-3 py-1.5">' +
+        '<span class="th-text text-sm">' + escapeHtml(label) + '</span>' +
+        '<input type="color" value="' + value + '" data-key="' + key + '"' + (cat ? ' data-cat="' + cat + '"' : '') +
+        ' class="w-12 h-8 p-0 border border-slate-300 rounded cursor-pointer bg-transparent shrink-0"></label>';
+    }
+
+    function buildConfigForm() {
+      var html = '';
+      THEME_SCHEMA.forEach(function(g) {
+        html += '<h4 class="th-muted text-xs font-bold uppercase tracking-wide mt-3 mb-1">' + g.title + '</h4>';
+        g.fields.forEach(function(f) { html += colorRow(f[1], theme[f[0]], f[0], null); });
+      });
+      html += '<h4 class="th-muted text-xs font-bold uppercase tracking-wide mt-4 mb-1">Categorías</h4>';
+      CODES.forEach(function(c) {
+        html += '<div class="th-line border rounded-lg px-3 py-1 mb-2">';
+        html += '<div class="th-text text-sm font-bold pt-1">' + c + ' · ' + CAT_NAMES[c] + '</div>';
+        html += colorRow('Encabezado', theme.cats[c].bg, 'bg', c);
+        html += colorRow('Texto del encabezado', theme.cats[c].text, 'text', c);
+        html += colorRow('Borde', theme.cats[c].border, 'border', c);
+        html += '</div>';
+      });
+      document.getElementById('config-body').innerHTML = html;
+    }
+
+    function onThemeInput(e) {
+      var t = e.target;
+      if (!t || !t.dataset || !t.dataset.key || !isColor(t.value)) return;
+      if (t.dataset.cat) theme.cats[t.dataset.cat][t.dataset.key] = t.value;
+      else theme[t.dataset.key] = t.value;
+      applyTheme();
+      saveTheme();
+    }
+
+    function openConfig() {
+      buildConfigForm();
+      var m = document.getElementById('config-modal');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    }
+
+    function closeConfig() {
+      var m = document.getElementById('config-modal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+
+    function resetTheme() {
+      if (!confirm('¿Restablecer todos los colores a los valores originales?')) return;
+      theme = cloneTheme(THEME_DEFAULTS);
+      saveTheme();
+      applyTheme();
+      buildConfigForm();
+    }
+
+    document.getElementById('config-body').addEventListener('input', onThemeInput);
+
     var noteEditingId = null;
 
     function openNoteModal(id) {
@@ -390,7 +556,7 @@
     }
 
     document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') closeNoteModal();
+      if (e.key === 'Escape') { closeNoteModal(); closeConfig(); }
     });
 
     function updateNote(id, noteText) {
@@ -495,17 +661,17 @@
             var html = '';
             for (var k = 0; k < catItems.length; k++) {
               var item = catItems[k];
-              html += '<div class="p-3 rounded-lg border transition flex flex-col gap-2 ' + (item.completed ? 'bg-emerald-50/60 border-emerald-200' : 'bg-white border-slate-200 hover:border-slate-300') + '">';
+              html += '<div class="p-3 rounded-lg border transition flex flex-col gap-2 ' + (item.completed ? 'th-item-done' : 'th-item') + '">';
               html += '  <div class="flex items-start justify-between gap-2">';
               html += '    <label class="flex items-start gap-2.5 cursor-pointer flex-1">';
               html += '      <input type="checkbox" ' + (item.completed ? 'checked' : '') + ' onchange="toggleCompleted(' + item.id + ')" class="mt-1 w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500">';
-              html += '      <span class="text-sm text-slate-800 leading-snug ' + (item.completed ? 'line-through text-slate-400' : '') + '">' + escapeHtml(item.text) + '</span>';
+              html += '      <span class="th-text text-sm leading-snug ' + (item.completed ? 'line-through opacity-50' : '') + '">' + escapeHtml(item.text) + '</span>';
               html += '    </label>';
               var hasNote = item.notes && String(item.notes).trim() !== '';
               html += '    <div class="flex items-center shrink-0">';
-              html += '      <button type="button" onclick="openNoteModal(' + item.id + ')" class="' + (hasNote ? 'text-indigo-600' : 'text-slate-400') + ' hover:text-indigo-700 transition p-1 cursor-pointer relative" title="' + (hasNote ? 'Ver / editar observación' : 'Agregar observación') + '" aria-label="Observación">';
+              html += '      <button type="button" onclick="openNoteModal(' + item.id + ')" class="' + (hasNote ? 'th-accent-text' : 'text-slate-400') + ' hover:text-indigo-700 transition p-1 cursor-pointer relative" title="' + (hasNote ? 'Ver / editar observación' : 'Agregar observación') + '" aria-label="Observación">';
               html += '        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 13l-1 4 4-1 9.268-9.268a2.5 2.5 0 00-3.536-3.536L9 13z"/></svg>';
-              if (hasNote) html += '        <span class="absolute top-0 right-0 w-2 h-2 bg-indigo-500 rounded-full"></span>';
+              if (hasNote) html += '        <span class="absolute top-0 right-0 w-2 h-2 th-accent-bg rounded-full"></span>';
               html += '      </button>';
               html += '      <button type="button" onclick="removeItem(' + item.id + ')" class="text-slate-400 hover:text-rose-600 transition p-1 cursor-pointer" title="Eliminar ítem" aria-label="Eliminar ítem">';
               html += '        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>';
@@ -520,6 +686,7 @@
       });
     }
 
+    loadTheme();
     loadData();
     renderAll();
     fetchFromGoogleSheets(false);
