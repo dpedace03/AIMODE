@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Matriz AIMODE - Gestión Mensual Multi-Dispositivo</title>
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen">
@@ -204,14 +203,14 @@
     </div>
 
     <footer class="mt-12 text-center text-xs text-slate-400 border-t border-slate-200 pt-6">
-      Matriz AIMODE · Modelo de Organización Mensual · Datos sincronizados con Google Sheets
+      Matriz AIMODE · Modelo de Organización Mensual · Datos almacenados en el navegador y sincronizados con Google Sheets
     </footer>
 
   </div>
 
   <script>
-    // REEMPLAZAR ESTA URL CON TU URL DE GOOGLE APPS SCRIPT
-    var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyL4dSgBYm3-95nxZclQ1b-GaG4Y6u-JURvTmSevc6bee3VO-CAtZYa2HgHIh6RUVE/exec";
+    // PEGAR TU URL DE GOOGLE APPS SCRIPT AQUÍ
+    var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/library/d/1OXKMqsglsehML-AnZi7MH9egHRB8xZ3KnHcoMarzThq9crN_uEQydVTq/3";
 
     var CODES = ['A', 'I', 'M', 'O', 'D', 'E'];
     var currentDate = new Date();
@@ -240,7 +239,6 @@
         }
       } catch (e) { console.error(e); }
 
-      // Datos por defecto si está completamente vacío
       var mk = getMonthKey();
       items = [
         { id: 1, month: mk, category: 'A', text: 'Ingresos por consultoría', completed: false, notes: 'Fidelizar clientes' },
@@ -263,37 +261,39 @@
     }
 
     function fetchFromGoogleSheets(showAlert) {
-      if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.indexOf("TU_SCRIPT_ID") !== -1) {
-        if (showAlert) alert("Primero configura tu URL de Google Apps Script en el archivo HTML.");
+      if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.indexOf("YOUR_SCRIPT_ID") !== -1) {
+        if (showAlert) alert("Configurá tu URL de Google Apps Script en el código HTML.");
         return;
       }
       
       fetch(GOOGLE_SCRIPT_URL)
         .then(function(res) { return res.json(); })
         .then(function(data) {
-          if (data && data.status === "success" && Array.isArray(data.items) && data.items.length > 0) {
-            items = data.items;
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-            renderAll();
-            if (showAlert) alert("¡Datos recargados desde Google Sheets!");
-          } else if (showAlert) {
-            alert("No se encontraron registros previos en la planilla.");
+          if (data && data.status === "success" && Array.isArray(data.items)) {
+            if (data.items.length > 0) {
+              items = data.items;
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+              renderAll();
+            }
+            if (showAlert) alert("¡Datos recargados desde la planilla!");
           }
         })
         .catch(function(err) {
-          console.log("No se pudo conectar con la planilla:", err);
-          if (showAlert) alert("No se pudo cargar la planilla. Se mantienen los datos locales.");
+          console.log("Error consultando planilla:", err);
+          if (showAlert) alert("No se pudo conectar a la planilla.");
         });
     }
 
     function syncToGoogleSheetsSilently() {
-      if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.indexOf("TU_SCRIPT_ID") !== -1) return;
-      fetch(GOOGLE_SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "sync_all", items: items })
-      }).catch(function(err) { console.log("Sync silencioso:", err); });
+      if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.indexOf("YOUR_SCRIPT_ID") !== -1) return;
+      try {
+        fetch(GOOGLE_SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ action: "sync_all", items: items })
+        }).catch(function(err) { console.log("Error sync:", err); });
+      } catch (e) { console.log(e); }
     }
 
     function handleKeyPress(e, code) {
@@ -462,10 +462,9 @@
       });
     }
 
-    // Inicialización
     loadData();
     renderAll();
-    fetchFromGoogleSheets(false); // Carga asíncrona segura sin bloquear la pantalla
+    fetchFromGoogleSheets(false);
   </script>
 </body>
 </html>
