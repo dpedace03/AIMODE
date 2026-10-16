@@ -57,6 +57,7 @@
         <div class="th-track w-full bg-slate-100 h-2.5 rounded-full overflow-hidden border border-slate-200">
           <div id="progress-bar" class="bg-emerald-500 h-full transition-all duration-300 w-0"></div>
         </div>
+        <button type="button" id="sync-status" onclick="fetchFromGoogleSheets(true)" class="th-muted text-[11px] text-left leading-tight cursor-pointer">● Conectando con la planilla…</button>
       </div>
 
       <!-- Acciones Globales (solo iconos, caben en pantallas de celular) -->
@@ -294,8 +295,13 @@
         return;
       }
       
-      fetch(GOOGLE_SCRIPT_URL)
+      setSyncStatus('wait', 'Conectando con la planilla…');
+      var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+      var timer = setTimeout(function() { if (ctrl) ctrl.abort(); }, 20000);
+      var url = GOOGLE_SCRIPT_URL + (GOOGLE_SCRIPT_URL.indexOf('?') > -1 ? '&' : '?') + '_=' + Date.now();
+      fetch(url, { cache: 'no-store', redirect: 'follow', signal: ctrl ? ctrl.signal : undefined })
         .then(function(res) {
+          clearTimeout(timer);
           if (!res.ok) throw new Error("HTTP " + res.status);
           return res.text();
         })
@@ -315,12 +321,24 @@
             canSync = true;
             syncToGoogleSheetsSilently(); // planilla vacía: subir lo local
           }
+          var d = new Date();
+          setSyncStatus('ok', 'Planilla sincronizada ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') + ' · ' + data.items.length + ' ítems');
           if (showAlert) alert("¡Datos recargados desde la planilla!");
         })
         .catch(function(err) {
+          clearTimeout(timer);
           console.error("Error consultando planilla:", err);
+          var msg = (err && err.name === 'AbortError') ? 'tardó demasiado' : (err && err.message === 'Failed to fetch' ? 'el celular no pudo acceder al script (¿acceso del script restringido?)' : (err && err.message) || 'error');
+          setSyncStatus('err', 'Sin conexión con la planilla: ' + msg + ' · tocá para reintentar');
           if (showAlert) alert("No se pudo leer la planilla:\n" + err.message);
         });
+    }
+
+    function setSyncStatus(kind, text) {
+      var el = document.getElementById('sync-status');
+      if (!el) return;
+      var color = kind === 'ok' ? '#059669' : (kind === 'err' ? '#e11d48' : '#94a3b8');
+      el.innerHTML = '<span style="color:' + color + '">●</span> ' + escapeHtml(text);
     }
 
     function syncToGoogleSheetsSilently() {
